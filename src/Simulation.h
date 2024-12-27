@@ -34,8 +34,6 @@ private:
 
     bool handle_input();
 
-    float static get_random_float();
-
 public:
     constexpr static int FRAME_RATE = 60;
 

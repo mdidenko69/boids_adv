@@ -2,11 +2,10 @@
 // Created by Ryan Strauss on 12/10/19.
 //
 
-#include <random>
 //#include <omp.h>
 #include "Simulation.h"
 #include <iostream>
-
+#include "random.h"
 
 Simulation::Simulation(unsigned int window_width, unsigned int window_height, float boid_size, float max_speed, float max_force,
                        float alignment_weight, float cohesion_weight, float separation_weight,
@@ -43,7 +42,7 @@ void Simulation::run(int flock_size) {
     window.setFramerateLimit(FRAME_RATE);
 
     for (int i = 0; i < flock_size; ++i) {
-        add_boid(get_random_float() * window_width, get_random_float() * window_height);
+        add_boid(utils::random(1.0f) * window_width, utils::random(1.0f) * window_height);
     }
 
     while (window.isOpen()) {
@@ -110,7 +109,7 @@ bool Simulation::handle_input() {
         }
         if (const auto* mouseButton = event->getIf<sf::Event::MouseButtonPressed>()) {
             if (mouseButton->button == sf::Mouse::Button::Left) {
-                std::cout << "scancode: " << (int)scode << "\n";
+                //std::cout << "scancode: " << (int)scode << "\n";
                 sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
                 add_boid(mouse_position.x, mouse_position.y, scode == Scancode::LControl);
             }
@@ -125,7 +124,7 @@ std::vector<double> Simulation::benchmark(int flock_size, int num_steps) {
     flock.clear();
 
     for (int i = 0; i < flock_size; ++i) {
-        add_boid(get_random_float() * window_width, get_random_float() * window_height, false);
+        add_boid(utils::random(1.0f) * window_width, utils::random(1.0f) * window_height, false);
     }
 
     for (int i = 0; i < num_steps; ++i) {
@@ -137,11 +136,4 @@ std::vector<double> Simulation::benchmark(int flock_size, int num_steps) {
     }
 
     return durations;
-}
-
-float Simulation::get_random_float() {
-    static std::random_device rd;
-    static std::mt19937 engine(rd());
-    static std::uniform_real_distribution<float> dist(0, 1);
-    return dist(engine);
 }

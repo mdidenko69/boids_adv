@@ -5,21 +5,23 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
 
 set(INSTALL_BIN_DIR ${PROJECT_SOURCE_DIR}/bin)
 set(INSTALL_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
 
 set(LIB_HEADERS
+        src/random.h
         src/Vector2D.h
+        src/Vector2D.inl
         src/Boid.h
         src/Flock.h
         src/Simulation.h
         src/KDTree.h)
 
 set(LIB_SOURCES
-        src/Vector2D.cpp
+        src/random.cpp
         src/Boid.cpp
         src/Flock.cpp
         src/Simulation.cpp

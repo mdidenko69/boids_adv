@@ -8,6 +8,7 @@
 #include <vector>
 #include "Vector2D.h"
 
+using Vector2D = utils::Vector2D<float>;
 class Boid {
 private:
     constexpr static float PREDATOR_ESCAPE_FACTOR = 10000000;
@@ -17,7 +18,7 @@ private:
     constexpr static float PREDATOR_ACCELERATION_BOOST = 1.4;
 
 public:
-    Vector2D position, velocity, acceleration;
+    Vector2D position, velocity;
     float max_width, max_height;
     float max_speed, max_force;
     float acceleration_scale;
@@ -30,13 +31,6 @@ public:
     Boid(float x, float y, float max_width, float max_height, float max_speed, float max_force,
          float acceleration_scale, float cohesion_weight, float alignment_weight, float separation_weight,
          float perception, float separation_distance, float noise_scale, bool is_predator = false);
-
-    Boid(const Boid &other);
-
-    ~Boid();
-
-    // Operators
-    Boid &operator=(const Boid &other);
 
     // Methods
     Vector2D alignment(const std::vector<Boid *> &boids) const;

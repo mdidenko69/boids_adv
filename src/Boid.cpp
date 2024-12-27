@@ -10,7 +10,6 @@ Boid::Boid(float x, float y, float max_width, float max_height, float max_speed,
            float perception, float separation_distance, float noise_scale, bool is_predator) {
     position = Vector2D{x, y};
     velocity = (Vector2D::random() - 0.5) * max_speed * 2;
-    acceleration = Vector2D{};
 
     this->max_width = max_width;
     this->max_height = max_height;
@@ -30,28 +29,6 @@ Boid::Boid(float x, float y, float max_width, float max_height, float max_speed,
         this->perception *= PREDATOR_PERCEPTION_BOOST;
     }
 }
-
-Boid::Boid(const Boid &other) {
-    position = other.position;
-    velocity = other.velocity;
-    acceleration = other.acceleration;
-    max_width = other.max_width;
-    max_height = other.max_height;
-    max_speed = other.max_speed;
-    max_force = other.max_force;
-    acceleration_scale = other.acceleration_scale;
-    cohesion_weight = other.cohesion_weight;
-    alignment_weight = other.alignment_weight;
-    separation_weight = other.separation_weight;
-    perception = other.perception;
-    separation_distance = other.separation_distance;
-    noise_scale = other.noise_scale;
-    is_predator = other.is_predator;
-}
-
-Boid::~Boid() = default;
-
-Boid &Boid::operator=(const Boid &other) = default;
 
 Vector2D Boid::alignment(const std::vector<Boid *> &boids) const {
     Vector2D perceived_velocity;
@@ -121,7 +98,7 @@ void Boid::update(const std::vector<Boid *> &boids) {
     Vector2D cohesion_update = cohesion(boids) * cohesion_weight;
     Vector2D separation_update = separation(boids) * separation_weight;
     // Apply the weighted forces to this boid
-    acceleration += alignment_update + cohesion_update + separation_update;
+    Vector2D acceleration = alignment_update + cohesion_update + separation_update;
     // Scale the acceleration then use it to update the velocity
     if (is_predator)
         acceleration *= PREDATOR_ACCELERATION_BOOST;
@@ -134,8 +111,6 @@ void Boid::update(const std::vector<Boid *> &boids) {
     velocity.limit(max_speed);
     // Then update the position based on the velocity
     position += velocity;
-    // Set the acceleration to zero before the next update
-    acceleration = 0;
     // If boid leaves the screen, update position so the boid wraps around
     if (position.x < 0) position.x += max_width;
     if (position.y < 0) position.y += max_height;

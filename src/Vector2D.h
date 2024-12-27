@@ -5,81 +5,65 @@
 #ifndef BOIDS_VECTOR2D_H
 #define BOIDS_VECTOR2D_H
 
+#include <cmath>
 
-class Vector2D {
-private:
+namespace utils {
+    template <typename T>
+    class Vector2D {
+    public:
+        T x{}, y{};
 
-    float static get_random_float();
+        // Constructors
+        Vector2D(T x = 0, T y = 0): x{x}, y{y} {}
+        static Vector2D random();
 
-public:
-    float x, y;
+        // Operators
+        Vector2D operator+(const Vector2D& other) const;
+        Vector2D operator+(T scalar) const;
 
-    // Constructors
-    explicit Vector2D(float x = 0, float y = 0);
+        Vector2D operator-(const Vector2D& other) const;
+        Vector2D operator-(T scalar) const;
 
-    Vector2D(const Vector2D &other);
+        Vector2D& operator+=(const Vector2D& other);
+        Vector2D& operator+=(T scalar);
 
-    ~Vector2D();
+        Vector2D& operator-=(const Vector2D& other);
+        Vector2D& operator-=(T scalar);
 
-    // Operators
-    Vector2D &operator=(const Vector2D &other);
+        Vector2D operator*(const Vector2D& other) const;
+        Vector2D operator*(T scalar) const;
 
-    Vector2D &operator=(float scalar);
+        Vector2D& operator*=(const Vector2D& other);
+        Vector2D& operator*=(T scalar);
 
-    Vector2D operator+(const Vector2D &other) const;
+        Vector2D operator/(const Vector2D& other) const;
+        Vector2D operator/(T scalar) const;
 
-    Vector2D operator-(const Vector2D &other) const;
+        Vector2D& operator/=(const Vector2D& other);
+        Vector2D& operator/=(T scalar);
 
-    Vector2D operator+(float scalar) const;
+        bool operator==(const Vector2D& other) const;
+        bool operator!=(const Vector2D& other) const;
+        Vector2D operator-() const;
 
-    Vector2D operator-(float scalar) const;
+        // Methods
+        T distance2(const Vector2D &other) const;
+        T distance(const Vector2D &other) const {
+            return std::sqrt(distance2(other));
+        }
 
-    Vector2D &operator+=(const Vector2D &other);
+        T toroidal_distance2(const Vector2D &other, T width, T height) const;
+        T toroidal_distance(const Vector2D &other, T width, T height) const {
+            return std::sqrt(toroidal_distance2(other, width, height));
+        }
 
-    Vector2D &operator-=(const Vector2D &other);
+        T magnitude() const;
+        Vector2D &normalize();
+        Vector2D &limit(T max);
+    };
 
-    Vector2D &operator+=(float scalar);
+}
 
-    Vector2D &operator-=(float scalar);
-
-    Vector2D operator*(const Vector2D &other) const;
-
-    Vector2D operator*(float scalar) const;
-
-    Vector2D &operator*=(const Vector2D &other);
-
-    Vector2D &operator*=(float scalar);
-
-    Vector2D operator/(const Vector2D &other) const;
-
-    Vector2D operator/(float scalar) const;
-
-    Vector2D &operator/=(const Vector2D &other);
-
-    Vector2D &operator/=(float scalar);
-
-    bool operator==(const Vector2D &other) const;
-
-    bool operator!=(const Vector2D &other) const;
-
-    Vector2D operator-() const;
-
-    // Methods
-    float distance(const Vector2D &other) const;
-
-    float toroidal_distance2(const Vector2D &other, float width, float height) const;
-
-    float toroidal_distance(const Vector2D &other, float width, float height) const;
-
-    float norm() const;
-
-    Vector2D &normalize();
-
-    Vector2D &limit(float max);
-
-    static Vector2D random();
-
-};
-
+#include "Vector2D.inl"
 
 #endif //BOIDS_VECTOR2D_H

@@ -44,11 +44,6 @@ void KDTree::insert(Boid *boid) {
     root = insert(root, boid, true);
 }
 
-double distance2(const Boid *boid, const Node::NodePtr &node) {
-    return std::pow((boid->position.x - node->boid->position.x), 2) +
-           std::pow((boid->position.y - node->boid->position.y), 2);
-}
-
 void KDTree::search(Boid *query, double radius, const Node::NodePtr &node, std::vector<Boid *> &results) const {
     double w = query->position.toroidal_distance2(node->boid->position, this->width, this->height);
 
