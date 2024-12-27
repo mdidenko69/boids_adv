@@ -15,7 +15,7 @@ class Simulation {
 private:
 
     sf::RenderWindow window;
-    int window_width, window_height;
+    unsigned int window_width, window_height;
     Flock flock;
     std::vector<sf::CircleShape> shapes;
 
@@ -55,7 +55,7 @@ public:
 
     constexpr static float DEFAULT_NOISE_SCALE = 0;
 
-    Simulation(int window_width, int window_height, float boid_size, float max_speed, float max_force,
+    Simulation(unsigned int window_width, unsigned int window_height, float boid_size, float max_speed, float max_force,
                float alignment_weight,
                float cohesion_weight, float separation_weight, float acceleration_scale, float perception,
                float separation_distance, float noise_scale, bool fullscreen = false, bool light_scheme = false,

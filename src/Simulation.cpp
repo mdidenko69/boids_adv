@@ -3,11 +3,12 @@
 //
 
 #include <random>
-#include <omp.h>
+//#include <omp.h>
 #include "Simulation.h"
+#include <iostream>
 
 
-Simulation::Simulation(int window_width, int window_height, float boid_size, float max_speed, float max_force,
+Simulation::Simulation(unsigned int window_width, unsigned int window_height, float boid_size, float max_speed, float max_force,
                        float alignment_weight, float cohesion_weight, float separation_weight,
                        float acceleration_scale, float perception, float separation_distance, float noise_scale,
                        bool fullscreen, bool light_scheme, int num_threads) {
@@ -25,7 +26,7 @@ Simulation::Simulation(int window_width, int window_height, float boid_size, flo
     this->noise_scale = noise_scale;
     this->fullscreen = fullscreen;
     this->light_scheme = light_scheme;
-    this->num_threads = num_threads < 0 ? omp_get_max_threads() : num_threads;
+//    this->num_threads = num_threads < 0 ? omp_get_max_threads() : num_threads;
 }
 
 Simulation::~Simulation() = default;
@@ -33,10 +34,10 @@ Simulation::~Simulation() = default;
 void Simulation::run(int flock_size) {
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     if (this->fullscreen) {
-        window.create(sf::VideoMode(desktop.width, desktop.height, desktop.bitsPerPixel), "Boids",
-                      sf::Style::Fullscreen);
+        window.create(sf::VideoMode({desktop.size.x, desktop.size.y}, desktop.bitsPerPixel), "Boids",
+                      sf::Style::Default);
     } else {
-        window.create(sf::VideoMode(window_width, window_height, desktop.bitsPerPixel), "Boids", sf::Style::Close);
+        window.create(sf::VideoMode({window_width, window_height}, desktop.bitsPerPixel), "Boids", sf::Style::Close);
     }
 
     window.setFramerateLimit(FRAME_RATE);
@@ -49,8 +50,6 @@ void Simulation::run(int flock_size) {
         if (handle_input()) break;
         render();
     }
-
-    std::exit(0);
 }
 
 void Simulation::add_boid(float x, float y, bool is_predator, bool with_shape) {
@@ -61,7 +60,7 @@ void Simulation::add_boid(float x, float y, bool is_predator, bool with_shape) {
     if (with_shape) {
         sf::CircleShape shape(is_predator ? boid_size * 1.3f : boid_size, 3);
 
-        shape.setPosition(x, y);
+        shape.setPosition({x, y});
         shape.setFillColor(is_predator ? sf::Color::Red : (light_scheme ? sf::Color::Black : sf::Color::Green));
         shape.setOutlineColor(light_scheme ? sf::Color::White : sf::Color::Black);
         shape.setOutlineThickness(1);
@@ -78,8 +77,8 @@ void Simulation::render() {
 
     for (int i = 0; i < shapes.size(); ++i) {
         Boid b = flock[i];
-        shapes[i].setPosition(b.position.x, b.position.y);
-        shapes[i].setRotation(b.angle());
+        shapes[i].setPosition({b.position.x, b.position.y});
+        shapes[i].setRotation(sf::degrees( b.angle()));
         window.draw(shapes[i]);
     }
 
@@ -87,27 +86,35 @@ void Simulation::render() {
 }
 
 bool Simulation::handle_input() {
-    sf::Event event;
+    using sf::Keyboard::Scancode;
 
-    while (window.pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
+    static Scancode scode = Scancode::Unknown;
+    while (const auto event = window.pollEvent()) {
+        if (event->is<sf::Event::Closed>()) {
             window.close();
             return true;
         }
-    }
-
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-        sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
-        add_boid(mouse_position.x, mouse_position.y, true);
-    } else if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
-        add_boid(mouse_position.x, mouse_position.y, false);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
-        flock.clear();
-        shapes.clear();
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-        window.close();
-        return true;
+        if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+           scode = keyPressed->scancode;
+           if (scode == Scancode::Escape || scode == Scancode::Q ) {
+               window.close();
+               return true;
+           }
+           if (scode == Scancode::C) {
+               flock.clear();
+               shapes.clear();
+           }
+        }
+        if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>()) {
+            scode = Scancode::Unknown;
+        }
+        if (const auto* mouseButton = event->getIf<sf::Event::MouseButtonPressed>()) {
+            if (mouseButton->button == sf::Mouse::Button::Left) {
+                std::cout << "scancode: " << (int)scode << "\n";
+                sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
+                add_boid(mouse_position.x, mouse_position.y, scode == Scancode::LControl);
+            }
+        }
     }
     return false;
 }

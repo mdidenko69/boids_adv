@@ -25,24 +25,16 @@ set(LIB_SOURCES
         src/Simulation.cpp
         src/KDTree.cpp)
 
-find_package(SFML CONFIG COMPONENTS graphics window system REQUIRED)
-find_package(OpenMP 4.5 REQUIRED)
-find_package(pybind11)
+#find_package(OpenMP 4.5 REQUIRED)
+# 3rd party dependencies
+add_subdirectory(lib)
 
 add_library(boids ${LIB_SOURCES} ${LIB_HEADERS})
-
-target_link_libraries(boids OpenMP::OpenMP_CXX sfml-graphics sfml-window sfml-system)
+target_link_libraries(boids SFML::Graphics SFML::System)
+#target_link_libraries(boids OpenMP::OpenMP_CXX SFML::Graphics SFML::System)
 
 add_executable(simulate src/main.cpp src/cxxopts.hpp)
 target_link_libraries(simulate boids)
 
 install(TARGETS simulate DESTINATION ${INSTALL_BIN_DIR})
 
-if (pybind11_FOUND)
-    pybind11_add_module(pyboids src/pyboids.cpp)
-    target_link_libraries(pyboids PUBLIC boids)
-
-    install(TARGETS pyboids
-            COMPONENT python
-            LIBRARY DESTINATION ${INSTALL_LIB_DIR})
-endif ()
