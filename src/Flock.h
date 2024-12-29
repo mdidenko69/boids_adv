@@ -14,19 +14,11 @@ private:
 
 public:
 
-    Flock();
-
-    Flock(const Flock &other);
-
-    ~Flock();
-
     Boid operator[](int i) const;
-
     void add(const Boid &boid);
-
     void clear();
 
-    void update(float window_width, float window_height, int num_threads = -1);
+    void update(const Vector2D& world_size, const UpdateParams& params, int num_threads = -1);
 
     int size() const;
 

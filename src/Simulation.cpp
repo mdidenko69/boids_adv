@@ -52,9 +52,7 @@ void Simulation::run(int flock_size) {
 }
 
 void Simulation::add_boid(float x, float y, bool is_predator, bool with_shape) {
-    Boid b = Boid{x, y, (float) window_width, (float) window_height, max_speed, max_force, acceleration_scale,
-                  cohesion_weight, alignment_weight, separation_weight, perception, separation_distance, noise_scale,
-                  is_predator};
+    Boid b = Boid{x, y, max_speed, perception, is_predator};
 
     if (with_shape) {
         sf::CircleShape shape(is_predator ? boid_size * 1.3f : boid_size, 3);
@@ -72,7 +70,17 @@ void Simulation::add_boid(float x, float y, bool is_predator, bool with_shape) {
 
 void Simulation::render() {
     window.clear(light_scheme ? sf::Color::White : sf::Color::Black);
-    flock.update(window_width, window_height, this->num_threads);
+    Vector2D world_size{static_cast<float>(window_width), static_cast<float>(window_height)};
+    UpdateParams params {
+        max_force,
+        acceleration_scale,
+        cohesion_weight,
+        alignment_weight,
+        separation_weight,
+        separation_distance,
+        noise_scale,
+    };
+    flock.update(world_size, params, this->num_threads);
 
     for (int i = 0; i < shapes.size(); ++i) {
         Boid b = flock[i];
@@ -127,9 +135,19 @@ std::vector<double> Simulation::benchmark(int flock_size, int num_steps) {
         add_boid(utils::random(1.0f) * window_width, utils::random(1.0f) * window_height, false);
     }
 
+    UpdateParams params {
+        max_force,
+        acceleration_scale,
+        cohesion_weight,
+        alignment_weight,
+        separation_weight,
+        separation_distance,
+        noise_scale,
+    };
+    Vector2D world_size{static_cast<float>(window_width), static_cast<float>(window_height)};
     for (int i = 0; i < num_steps; ++i) {
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-        flock.update(window_width, window_height, this->num_threads);
+        flock.update(world_size, params, this->num_threads);
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
         double ticks = (double) std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
         durations.push_back(ticks / 1000000000);

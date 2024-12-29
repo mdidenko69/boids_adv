@@ -12,28 +12,6 @@
 #include "Flock.h"
 
 class Simulation {
-private:
-
-    sf::RenderWindow window;
-    unsigned int window_width, window_height;
-    Flock flock;
-    std::vector<sf::CircleShape> shapes;
-
-    bool light_scheme, fullscreen;
-    float max_speed, max_force;
-    float acceleration_scale;
-    float perception, separation_distance;
-    float cohesion_weight, alignment_weight, separation_weight;
-    float noise_scale;
-    float boid_size;
-    int num_threads;
-
-    void add_boid(float x, float y, bool is_predator = false, bool with_shape = true);
-
-    void render();
-
-    bool handle_input();
-
 public:
     constexpr static int FRAME_RATE = 60;
 
@@ -64,6 +42,28 @@ public:
     void run(int flock_size);
 
     std::vector<double> benchmark(int flock_size, int num_steps);
+
+private:
+
+  sf::RenderWindow window;
+  unsigned int window_width, window_height;
+  Flock flock;
+  std::vector<sf::CircleShape> shapes;
+
+  bool light_scheme, fullscreen;
+  float max_speed, max_force;
+  float acceleration_scale;
+  float perception, separation_distance;
+  float cohesion_weight, alignment_weight, separation_weight;
+  float noise_scale;
+  float boid_size;
+  int num_threads;
+
+  void add_boid(float x, float y, bool is_predator = false, bool with_shape = true);
+
+  void render();
+
+  bool handle_input();
 
 };
 

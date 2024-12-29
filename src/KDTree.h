@@ -9,37 +9,33 @@
 #include <memory>
 #include "Boid.h"
 
-class Node {
-public:
-    using NodePtr = std::shared_ptr<Node>;
-
-    NodePtr left, right;
-    Boid *boid;
-    bool vertical;
-
-    Node(Boid *boid, bool vertical, const NodePtr &left, const NodePtr &right);
-
-    ~Node();
-
-    bool isLeaf() const;
-};
-
 class KDTree {
-private:
-    float width, height;
-
-    Node::NodePtr root;
-
-    Node::NodePtr insert(const Node::NodePtr &node, Boid *boid, bool vertical);
-
-    void search(Boid *query, double radius, const Node::NodePtr &node, std::vector<Boid *> &results) const;
-
 public:
     KDTree(float width, float height);
 
     void insert(Boid *boid);
 
-    std::vector<Boid *> search(Boid *query, double radius) const;
+    std::vector<Boid *> search(Boid *query) const;
+
+private:
+    struct Node {
+        using NodePtr = std::shared_ptr<Node>;
+
+        NodePtr left, right;
+        Boid *boid;
+        bool vertical;
+
+        Node(Boid *boid, bool vertical, const NodePtr &left, const NodePtr &right);
+
+        bool isLeaf() const;
+    };
+
+    float width, height;
+    Node::NodePtr root;
+
+    static Node::NodePtr insert(const Node::NodePtr &node, Boid *boid, bool vertical);
+
+    void search(Boid *query, const Node::NodePtr &node, std::vector<Boid *> &results) const;
 };
 
 
